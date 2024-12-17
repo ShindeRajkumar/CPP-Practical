@@ -1,0 +1,231 @@
+#include <iostream>
+#include <cctype>
+using namespace std;
+
+typedef struct Node {
+    char data;
+    struct Node *next;
+} Node;
+
+class Stack {
+    Node *top;
+
+public:
+    Stack() {
+        top = nullptr;
+    }
+
+    bool isEmpty() {
+        return top == nullptr;
+    }
+
+    void push(char x) {
+        Node *newNode = new Node();
+        newNode->data = x;
+        newNode->next = top;
+        top = newNode;
+    }
+
+    char pop() {
+        if (isEmpty()) {
+            cerr << "Stack Underflow!" << endl;
+            return '\0';
+        }
+        Node *temp = top;
+        char x = temp->data;
+        top = top->next;
+        delete temp;
+        return x;
+    }
+
+    char peek() {
+        if (!isEmpty())
+            return top->data;
+        cerr << "Stack is Empty!" << endl;
+        return '\0';
+    }
+};
+
+void infixToPostfix(const char infix[], char postfix[]);
+void reverseString(const char input[], char reversed[]);
+void infixToPrefix(const char infix[], char prefix[]);
+int evaluateExpression(int op1, int op2, char op);
+void evaluatePostfix(const char postfix[]);
+int getPrecedence(char x);
+void evaluatePrefix(const char prefix[]);
+
+int main() {
+    char infix[20], postfix[20], prefix[20];
+    int choice;
+
+    do {
+        cout << "\n1. Convert Infix to Postfix"
+             << "\n2. Convert Infix to Prefix"
+             << "\n3. Evaluate Postfix Expression"
+             << "\n4. Evaluate Prefix Expression"
+             << "\n5. Exit"
+             << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "\nEnter Infix Expression: ";
+                cin >> infix;
+                infixToPostfix(infix, postfix);
+                cout << "\nPostfix Expression: " << postfix;
+                break;
+
+            case 2:
+                cout << "\nEnter Infix Expression: ";
+                cin >> infix;
+                infixToPrefix(infix, prefix);
+                cout << "\nPrefix Expression: " << prefix;
+                break;
+
+            case 3:
+                cout << "\nEnter Postfix Expression: ";
+                cin >> postfix;
+                evaluatePostfix(postfix);
+                break;
+
+            case 4:
+                cout << "\nEnter Prefix Expression: ";
+                cin >> prefix;
+                evaluatePrefix(prefix);
+                break;
+
+            case 5:
+                cout << "\nExiting...";
+                break;
+
+            default:
+                cout << "\nInvalid choice. Try again.";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
+
+void infixToPostfix(const char infix[], char postfix[]) {
+    Stack s;
+    int j = 0;
+    char token, x;
+
+    for (int i = 0; infix[i] != '\0'; i++) {
+        token = infix[i];
+
+        if (isalnum(token)) {
+            postfix[j++] = token;
+        } else if (token == '(') {
+            s.push(token);
+        } else if (token == ')') {
+            while ((x = s.pop()) != '(') {
+                postfix[j++] = x;
+            }
+        } else {
+            while (!s.isEmpty() && getPrecedence(token) <= getPrecedence(s.peek())) {
+                postfix[j++] = s.pop();
+            }
+            s.push(token);
+        }
+    }
+
+    while (!s.isEmpty()) {
+        postfix[j++] = s.pop();
+    }
+    postfix[j] = '\0';
+}
+
+void reverseString(const char input[], char reversed[]) {
+    int length = 0;
+
+    for (; input[length] != '\0'; length++);
+
+    for (int i = 0, j = length - 1; j >= 0; i++, j--) {
+        if (input[j] == '(') {
+            reversed[i] = ')';
+        } else if (input[j] == ')') {
+            reversed[i] = '(';
+        } else {
+            reversed[i] = input[j];
+        }
+    }
+
+    reversed[length] = '\0';
+}
+
+void infixToPrefix(const char infix[], char prefix[]) {
+    char reversedInfix[20], reversedPostfix[20];
+    reverseString(infix, reversedInfix);
+    infixToPostfix(reversedInfix, reversedPostfix);
+    reverseString(reversedPostfix, prefix);
+}
+
+int getPrecedence(char x) {
+    if (x == '(') return 0;
+    if (x == '+' || x == '-') return 1;
+    if (x == '*' || x == '/') return 2;
+    return 3;
+}
+
+int evaluateExpression(int op1, int op2, char op) {
+    switch (op) {
+        case '+': return op1 + op2;
+        case '-': return op1 - op2;
+        case '*': return op1 * op2;
+        case '/': return op1 / op2;
+        case '%': return op1 % op2;
+        default: return 0;
+    }
+}
+
+void evaluatePostfix(const char postfix[]) {
+    Stack s;
+    int op1, op2, result;
+    char token;
+
+    for (int i = 0; postfix[i] != '\0'; i++) {
+        token = postfix[i];
+
+        if (isalnum(token)) {
+            int value;
+            cout << "Enter the value of " << token << ": ";
+            cin >> value;
+            s.push(value);
+        } else {
+            op2 = s.pop();
+            op1 = s.pop();
+            result = evaluateExpression(op1, op2, token);
+            s.push(result);
+        }
+    }
+    result = s.pop();
+    cout << "Result: " << result << endl;
+}
+
+void evaluatePrefix(const char prefix[]) {
+    Stack s;
+    int op1, op2, result;
+    char token;
+    int i;
+    for (int i = 0; prefix[i] != '\0'; i++); // Move to the end of the string
+    int length = i;
+
+    for (int i = length - 1; i >= 0; i--) {
+        token = prefix[i];
+
+        if (isalnum(token)) {
+            int value;
+            cout << "Enter the value of " << token << ": ";
+            cin >> value;
+            s.push(value);
+        } else {
+            op1 = s.pop();
+            op2 = s.pop();
+            result = evaluateExpression(op1, op2, token);
+            s.push(result);
+        }
+    }
+    result = s.pop();
+    cout << "Result: " << result << endl;
+}
