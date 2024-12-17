@@ -1,1 +1,288 @@
+Searching and Sorting :
 
+        
+#include<string.h>
+using namespace std;
+
+typedef struct student{
+    int roll;
+    char name [20];
+    float marks;
+}stud;
+
+void create(stud s[20], int n);
+void display(stud s[20], int n);
+void bubble_sort(stud s[20], int n);
+void insertion_sort(stud s[20], int n);
+void quick_sort(stud s[20], int l, int h);
+int partition(stud s[20], int l, int h);
+void search(stud s[20], int n, int key);
+int bsearch(stud s[20],char x[20], int low, int high);
+
+int main(){
+    stud s[20];
+    int choice, n, key, result;
+    char x[20];
+
+    do
+    {
+        cout<<"\n1)Creat Student Database";
+        cout<<"\n2)Display Student Database";
+        cout<<"\n3)Bubble Sort";
+        cout<<"\n4)Insertion Sort";
+        cout<<"\n5)Quick Sort";
+        cout<<"\n6)Linear Search";
+        cout<<"\n7)Binary Search";
+        cout<<"\n8)Exit";
+        cout<<"\nEnter choice : ";
+        cin>>choice;
+
+        switch (choice)
+        {
+        case 1 :
+        cout<<"\nEnter the number of Records : ";
+            cin>>n;
+            create(s, n);
+            break;
+
+        case 2 :
+            display(s, n);
+            break;
+
+        case 3 : 
+            if (n > 0) {
+                    bubble_sort(s, n);
+                    cout << "Database sorted by Roll Number.\n";
+                } else {
+                    cout << "No records found. Please create the database first.\n";
+                }
+                break;
+        case 4 :
+            if (n > 0) {
+                    insertion_sort(s, n);
+                    cout << "Database sorted by Name.\n";
+                } else {
+                    cout << "No records found. Please create the database first.\n";
+                }
+                break;
+        case 5 : 
+           if (n > 0) {
+                    quick_sort(s, 0, n - 1);
+                    cout << "Database sorted by Marks (descending).\n";
+                } else {
+                    cout << "No records found. Please create the database first.\n";
+                }
+                break;
+
+        case 6 :
+            cout<<"Enter the marks that you want to search : ";
+            cin>>key;
+            search(s, n, key);
+            break;
+
+        case 7 :
+            cout<<"\nEnter the name of the student : ";
+            cin>>x;
+
+            result = bsearch(s, x, 0, n-1);
+            if(result==-1){
+                cout<<"Student name you want to search is not preasent ";
+            }
+            else{
+                cout<<"The student is presnt :\t"<<s[result].name;
+            }
+            break;
+
+
+        case 8 :
+            return 0;
+
+        
+        default:
+            cout<<"Invalid input"<<endl;
+            break;
+        }
+        
+    } while (choice!=8);   
+}
+
+void create(stud s[20], int n){
+    int i;
+    for(i=0; i<n; i++){
+        cout<<"\nEnter the roll no. : ";
+        cin>>s[i].roll;
+        cout<<"\nEnter the name : ";
+        cin>>s[i].name;
+        cout<<"\nEnter the marks : ";
+        cin>>s[i].marks;   
+    }
+}
+
+void display(stud s[20], int n){
+    int i;
+    cout<<"\n\t1)Roll No. "<<"\t2)Name"<<"\t3)Marks";
+    for(i=0; i<n; i++){
+        cout<<"\n";
+        cout<<"\t"<<s[i].roll<<"\t"<<s[i].name<<"\t"<<s[i].marks;
+    }
+}
+
+void bubble_sort(stud s[20], int n){
+    for(int i=1; i<n; i++){
+        for(int j=0; j<n-i; j++){
+            if(s[j].roll>s[j+1].roll){
+                swap(s[j], s[j+1] );
+            }
+        }
+    }
+}
+
+void insertion_sort(stud s[20], int n){
+    for(int i=1; i<n; i++){
+        stud key = s[i];
+        int j = i-1;
+        while (j>=0 && strcmp(s[j].name, key.name)>0){
+            s[j+1] = s[j];
+            j--;
+        }
+        s[j+1] = key;
+    }
+}
+
+void quick_sort(stud s[20], int l, int h){
+    if(l<h){
+        int j = partition(s, l, h);
+        quick_sort(s, l, j-1);
+        quick_sort(s, j+1, h);
+    }    
+}
+
+int partition(stud s[20], int l, int h){
+    float pivot = s[l].marks;
+    int i =l+1;
+    int j = h;
+
+    while (true){
+        //find the value greater than pivot element towards right for 'i'
+        while(i<=j && s[i].marks > pivot){
+            i++;
+        }
+        //find the value smaller than pivot element towards left for 'j'
+        while (i<=j && s[j].marks <= pivot){
+            j--;
+        }
+        if(i<=j){
+            swap(s[i], s[j]);
+            i++;
+            j--;
+        }
+        else
+        break;
+    }
+    swap(s[l], s[j]);
+    return j;
+
+}
+
+void search(stud s[20], int n, int key){
+    cout<<"\n"<<"\t"<<"Roll No. "<<"\t"<<"Name"<<"\t"<<"MARKS";
+    for(int i=0; i<n; i++){
+        if(key==s[i].marks){
+            cout<<"\n"<<s[i].roll<<"\t"<<s[i].name<<"\t"<<s[i].marks;
+        }
+    }
+}
+
+int bsearch(stud s[20],char x[20], int low, int high){
+    int mid;
+    while(low<=high){
+        mid = (low+high)/2;
+        /*if(x==s[mid].name){
+            return mid;
+        }*/
+        if(strcmp(x, s[mid].name)==0){
+            return mid;
+        }
+        else if (strcmp(x, s[mid].name)<0){
+            high = mid - 1;
+        }
+        else{
+            low = mid + 1;
+        }
+    }
+    return -1;
+    
+}
+
+
+ 
+
+
+        s[j+1] = key;
+    }
+}
+
+void quick_sort(stud s[20], int l, int h){
+    if(l<h){
+        int j = partition(s, l, h);
+        quick_sort(s, l, j-1);
+        quick_sort(s, j+1, h);
+    }    
+}
+
+int partition(stud s[20], int l, int h){
+    float pivot = s[l].marks;
+    int i =l+1;
+    int j = h;
+
+    while (true){
+        //find the value greater than pivot element towards right for 'i'
+        while(i<=j && s[i].marks > pivot){
+            i++;
+        }
+        //find the value smaller than pivot element towards left for 'j'
+        while (i<=j && s[j].marks <= pivot){
+            j--;
+        }
+        if(i<=j){
+            swap(s[i], s[j]);
+            i++;
+            j--;
+        }
+        else
+        break;
+    }
+    swap(s[l], s[j]);
+    return j;
+
+}
+
+void search(stud s[20], int n, int key){
+    cout<<"\n"<<"\t"<<"Roll No. "<<"\t"<<"Name"<<"\t"<<"MARKS";
+    for(int i=0; i<n; i++){
+        if(key==s[i].marks){
+            cout<<"\n"<<s[i].roll<<"\t"<<s[i].name<<"\t"<<s[i].marks;
+        }
+    }
+}
+
+int bsearch(stud s[20],char x[20], int low, int high){
+    int mid;
+    while(low<=high){
+        mid = (low+high)/2;
+        /*if(x==s[mid].name){
+            return mid;
+        }*/
+        if(strcmp(x, s[mid].name)==0){
+            return mid;
+        }
+        else if (strcmp(x, s[mid].name)<0){
+            high = mid - 1;
+        }
+        else{
+            low = mid + 1;
+        }
+    }
+    return -1;
+    
+}
