@@ -1,0 +1,153 @@
+Threaded Binary Tree :
+
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    int lth, rth; // Left and Right Thread Indicators
+    Node *left, *right;
+
+    Node(int val) {
+        data = val;
+        lth = rth = 0;
+        left = right = nullptr;
+    }
+};
+
+class ThreadedBinaryTree {
+private:
+    Node *dummy;
+    Node *root;
+
+    void insert(Node *root, Node *newNode);
+    void inorderTraversal(Node *current, Node *dummy);
+    void preorderTraversal(Node *current, Node *dummy);
+
+public:
+    ThreadedBinaryTree();
+    void create();
+    void display();
+};
+
+ThreadedBinaryTree::ThreadedBinaryTree() {
+    root = nullptr;
+    dummy = new Node(-999); // Create dummy node
+}
+
+void ThreadedBinaryTree::create() {
+    int val;
+    cout << "\nEnter the element: ";
+    cin >> val;
+
+    Node *newNode = new Node(val);
+
+    if (root == nullptr) {
+        root = newNode;
+        dummy->left = root;
+        root->left = dummy;
+        root->right = dummy;
+    } else {
+        insert(root, newNode);
+    }
+}
+
+void ThreadedBinaryTree::insert(Node *current, Node *newNode) {
+    if (newNode->data < current->data) {
+        if (current->lth == 0) {
+            newNode->left = current->left;
+            newNode->right = current;
+            current->left = newNode;
+            current->lth = 1;
+        } else {
+            insert(current->left, newNode);
+        }
+    } else if (newNode->data > current->data) {
+        if (current->rth == 0) {
+            newNode->right = current->right;
+            newNode->left = current;
+            current->right = newNode;
+            current->rth = 1;
+        } else {
+            insert(current->right, newNode);
+        }
+    }
+}
+
+void ThreadedBinaryTree::inorderTraversal(Node *current, Node *dummy) {
+    while (current != dummy) {
+        while (current->lth == 1) {
+            current = current->left;
+        }
+        cout << current->data << " ";
+        while (current->rth == 0) {
+            current = current->right;
+            if (current == dummy) return;
+            cout << current->data << " ";
+        }
+        current = current->right;
+    }
+}
+
+void ThreadedBinaryTree::preorderTraversal(Node *current, Node *dummy) {
+    while (current != dummy) {
+        cout << current->data << " ";
+        if (current->lth == 1) {
+            current = current->left;
+        } else {
+            while (current->rth == 0 && current != dummy) {
+                current = current->right;
+            }
+            current = current->right;
+        }
+    }
+}
+
+void ThreadedBinaryTree::display() {
+    if (root == nullptr) {
+        cout << "Tree is not created." << endl;
+        return;
+    }
+
+    cout << "\nInorder Traversal: ";
+    inorderTraversal(root, dummy);
+    cout << "\nPreorder Traversal: ";
+    preorderTraversal(root, dummy);
+    cout << endl;
+}
+
+int main() {
+    ThreadedBinaryTree tree;
+    int choice;
+    char ans;
+
+    do {
+        cout << "\nProgram for Threaded Binary Tree\n";
+        cout << "1) Create\n2) Display\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            do {
+                tree.create();
+                cout << "\nDo you want to enter more elements? (y/n): ";
+                cin >> ans;
+            } while (ans == 'y' || ans == 'Y');
+            break;
+
+        case 2:
+            tree.display();
+            break;
+
+        default:
+            cout << "Invalid choice!\n";
+            break;
+        }
+
+        cout << "\nWant to see the main menu? (y/n): ";
+        cin >> ans;
+    } while (ans == 'y' || ans == 'Y');
+
+    return 0;
+}
