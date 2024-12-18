@@ -1,0 +1,122 @@
+Shortest Path :
+
+
+#include<iostream>
+using namespace std;
+
+class Graph {
+    int g[20][20]; 
+    int e, v;
+
+public:
+    void accept() {
+        int src, dest, cost;
+        cout << "\nEnter number of vertices: ";
+        cin >> v;
+        cout << "\nEnter number of edges: ";
+        cin >> e;
+
+        // Initialize the graph matrix
+        for (int i = 0; i < v; i++) {
+            for (int j = 0; j < v; j++) {
+                if (i == j)
+                    g[i][j] = 0; // Distance from a node to itself is 0
+                else
+                    g[i][j] = 9999; // Infinite cost for non-direct edges
+            }
+        }
+
+        // Accept edges and their costs
+        for (int i = 0; i < e; i++) {
+            cout << "\nEnter source and destination (0 to " << v - 1 << "): ";
+            cin >> src >> dest;
+            cout << "Enter the cost of the edge: ";
+            cin >> cost;
+            g[src][dest] = cost; // Directed edge from src to dest
+        }
+    }
+
+    void display() {
+        cout << "\nAdjacency Matrix:\n";
+        for (int i = 0; i < v; i++) {
+            for (int j = 0; j < v; j++) {
+                if (g[i][j] == 9999)
+                    cout << "∞\t";
+                else
+                    cout << g[i][j] << "\t";
+            }
+            cout << endl;
+        }
+    }
+
+    void dijkstra(int start) {
+        int distance[20], visited[20], from[20];
+        int r[20][20], mindst, next;
+
+        // Initialize the distance matrix
+        for (int i = 0; i < v; i++) {
+            for (int j = 0; j < v; j++) {
+                if (g[i][j] == 0) 
+                    r[i][j] = 9999;  // No direct path
+                else 
+                    r[i][j] = g[i][j]; // Cost of edge
+            }
+        }
+
+        // Initialize distance, visited and from arrays
+        for (int i = 0; i < v; i++) {
+            distance[i] = r[start][i];
+            visited[i] = 0;
+            from[i] = start;
+        }
+        distance[start] = 0;
+        visited[start] = 1;
+
+        // Dijkstra algorithm loop
+        for (int cnt = 1; cnt < v; cnt++) {
+            mindst = 9999;
+            // Find the vertex with the minimum distance
+            for (int i = 0; i < v; i++) {
+                if (!visited[i] && distance[i] < mindst) {
+                    mindst = distance[i];
+                    next = i;
+                }
+            }
+            visited[next] = 1;
+
+            // Update the distance of adjacent vertices
+            for (int i = 0; i < v; i++) {
+                if (!visited[i] && (mindst + r[next][i] < distance[i])) {
+                    distance[i] = mindst + r[next][i];
+                    from[i] = next;
+                }
+            }
+        }
+
+        // Display the shortest path and distance
+        for (int i = 0; i < v; i++) {
+            if (i != start) {
+                cout << "\nShortest distance from vertex " << start << " to vertex " << i << " is: " << distance[i];
+                cout << "\nPath: " << i;
+                int j = i;
+                // Print the path from destination back to source
+                while (j != start) {
+                    j = from[j];
+                    cout << " <- " << j;
+                }
+                cout << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    int s;
+    Graph g;
+    g.accept();
+    g.display();
+    cout << "\nEnter the starting vertex: ";
+    cin >> s;
+    g.dijkstra(s);
+    return 0;
+}
