@@ -1,0 +1,52 @@
+#include <iostream>
+using namespace std;
+void MAXheapify(int arr[],int n,int i){
+    int largest=i;
+    int left=i*2;
+    int right=(i*2)+1;
+    //left child large than root
+    while(left<n && arr[left]>arr[largest]){
+        largest=left;
+    }
+    //right child large than root
+    while(right<n && arr[right]>arr[largest]){
+        largest =right;
+    }
+    //if largest is not root
+    if(largest!=i){
+        swap(arr[i],arr[largest]);
+        // after swapping recursively maxh
+        MAXheapify(arr,n,largest);
+    }
+}
+ void Maxheapsort(int arr[],int n){
+    for (int i = n / 2 - 1; i >= 0; i--)
+    {
+        MAXheapify(arr, n, i);
+    }
+
+    for (int i = n - 1; i > 0; i--) 
+    {
+        swap(arr[0], arr[i]);
+        MAXheapify(arr, i, 0);
+    }
+}
+void display(int arr[],int n){
+    for(int i=0;i<n;i++){
+        cout<<arr[i]<<" ";
+    }
+
+}
+int main(){
+int arr[]={2,5,34,99,1,7,66};
+cout<<"array before sorting"<<endl;
+int n=sizeof(arr)/sizeof(arr[0]);
+for(int i=0;i<n;i++){
+    cout<<arr[i]<<" ";
+}
+cout<<endl;
+Maxheapsort(arr,n);
+cout<<"array after max heapsort"<<endl;
+display(arr,n);
+}
+
