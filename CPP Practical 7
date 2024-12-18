@@ -1,0 +1,196 @@
+Prism :
+
+
+#include <iostream>
+#include <vector>
+#include <limits>
+#define INFINITY std::numeric_limits<int>::max() // Use standard infinity for clarity
+using namespace std;
+
+class MST {
+private:
+    vector<vector<int>> graph; // Dynamic size based on nodes
+    int nodes;
+
+public:
+    MST(int n) : nodes(n), graph(n, vector<int>(n, 0)) {} // Initialize graph with 0s
+    void prim();
+    void getData();
+};
+
+void MST::prim() {
+    vector<bool> selected(nodes, false); // Track selected nodes
+    int totalWeight = 0;
+
+    cout << "\nThe Minimum Spanning Tree:\n";
+    selected[0] = true; // Start from the first node
+
+    for (int edgeCount = 0; edgeCount < nodes - 1; edgeCount++) {
+        int minDist = INFINITY;
+        int v1 = -1, v2 = -1;
+
+        // Find the minimum weight edge connecting selected and unselected nodes
+        for (int i = 0; i < nodes; i++) {
+            if (selected[i]) {
+                for (int j = 0; j < nodes; j++) {
+                    if (!selected[j] && graph[i][j] && graph[i][j] < minDist) {
+                        minDist = graph[i][j];
+                        v1 = i;
+                        v2 = j;
+                    }
+                }
+            }
+        }
+
+        if (v1 != -1 && v2 != -1) {
+            cout << "Edge: " << v1 << " - " << v2 << " Weight: " << minDist << "\n";
+            selected[v2] = true; // Mark the second node as selected
+            totalWeight += minDist;
+        }
+    }
+
+    cout << "\nTotal Weight of Minimum Spanning Tree: " << totalWeight << endl;
+}
+
+void MST::getData() {
+    int edges;
+    cout << "Enter the total number of nodes in the graph: ";
+    cin >> nodes;
+    graph.resize(nodes, vector<int>(nodes, 0)); // Adjust graph size based on nodes
+
+    cout << "Enter the total number of edges in the graph: ";
+    cin >> edges;
+
+    cout << "Enter the edges and their weights:\n";
+    for (int i = 0; i < edges; i++) {
+        int v1, v2, weight;
+        cout << "Edge (v1 v2): ";
+        cin >> v1 >> v2;
+        cout << "Weight: ";
+        cin >> weight;
+
+        graph[v1][v2] = graph[v2][v1] = weight; // Undirected graph
+    }
+}
+
+int main() {
+    cout << "Prim's Algorithm\n";
+    int nodes;
+    cout << "Enter the number of nodes: ";
+    cin >> nodes;
+
+    MST mst(nodes);
+    mst.getData();
+    cout << "\n";
+    mst.prim();
+
+    return 0;
+}
+
+
+
+
+Kruskal's :
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+#define edge pair<int, int>
+
+class Graph {
+private:
+    vector<pair<int, edge>> edges; // Stores graph edges with weights
+    vector<pair<int, edge>> mst;  // Stores edges in the Minimum Spanning Tree (MST)
+    vector<int> parent, rank;     // Union-Find structures
+    int V;                        // Number of vertices
+
+public:
+    Graph(int V);
+    void addEdge(int u, int v, int w);
+    int findSet(int i);
+    void unionSet(int u, int v);
+    void kruskalMST();
+    void printMST();
+};
+
+Graph::Graph(int V) : V(V), parent(V), rank(V, 0) {
+    // Initialize each vertex as its own parent
+    for (int i = 0; i < V; ++i) {
+        parent[i] = i;
+    }
+}
+
+void Graph::addEdge(int u, int v, int w) {
+    edges.push_back({w, {u, v}});
+}
+
+int Graph::findSet(int i) {
+    // Path Compression: Make the parent of i point to the root
+    if (i != parent[i]) {
+        parent[i] = findSet(parent[i]);
+    }
+    return parent[i];
+}
+
+void Graph::unionSet(int u, int v) {
+    int rootU = findSet(u);
+    int rootV = findSet(v);
+
+    // Union by Rank: Attach the smaller tree under the larger tree
+    if (rootU != rootV) {
+        if (rank[rootU] < rank[rootV]) {
+            parent[rootU] = rootV;
+        } else if (rank[rootU] > rank[rootV]) {
+            parent[rootV] = rootU;
+        } else {
+            parent[rootV] = rootU;
+            rank[rootU]++;
+        }
+    }
+}
+
+void Graph::kruskalMST() {
+    // Sort edges by weight in ascending order
+    sort(edges.begin(), edges.end());
+
+    for (auto &[weight, e] : edges) {
+        int u = e.first;
+        int v = e.second;
+
+        // Check if adding this edge forms a cycle
+        if (findSet(u) != findSet(v)) {
+            mst.push_back({weight, {u, v}});
+            unionSet(u, v);
+        }
+    }
+}
+
+void Graph::printMST() {
+    cout << "Edges in the Minimum Spanning Tree:\n";
+    cout << "Edge\tWeight\n";
+    for (auto &[weight, e] : mst) {
+        cout << e.first << " - " << e.second << "\t" << weight << "\n";
+    }
+}
+
+int main() {
+    Graph g(6);
+
+    // Add edges (u, v, weight)
+    g.addEdge(0, 1, 4);
+    g.addEdge(0, 2, 4);
+    g.addEdge(1, 2, 2);
+    g.addEdge(2, 3, 3);
+    g.addEdge(2, 5, 2);
+    g.addEdge(2, 4, 4);
+    g.addEdge(3, 4, 3);
+    g.addEdge(5, 4, 3);
+
+    g.kruskalMST();
+    g.printMST();
+
+    return 0;
+}
+
