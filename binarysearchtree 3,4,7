@@ -1,0 +1,114 @@
+#include <iostream>
+using namespace std;
+struct  Node{
+  int data;
+  Node *left;
+  Node *right;
+  Node(int value){
+    data=value;
+    left=NULL;
+    right=NULL;
+  }
+};
+Node* InsertIntoBST(Node*root,int value){
+    //base case
+    if(root==NULL){
+        return new Node(value);
+    }
+    if(value<root->data){
+        root->left=InsertIntoBST(root->left,value);
+    }
+    else{
+      root->right=InsertIntoBST(root->right,value);
+    }
+    //else if(value>root->data) {
+       // root->right=InsertIntoBST(root->right,value);
+    //
+
+    return root;
+}
+Node* DeleteIntoBST(Node*root,int value){
+      // base case
+      if(root==NULL){
+        return NULL;
+      }
+  // 0 child
+   if(root->data==value){
+    delete root;
+    return NULL;
+   }
+   // 1 child to left
+   if(root->left!=NULL && root->right==NULL){
+       Node*temp=root->left;
+       delete root;
+       return temp;
+   }
+   // 1 child to right
+   if(root->right!=NULL && root->left==NULL){
+       Node*temp=root->right;
+       delete root;
+       return temp;
+   }
+// 2 child
+    if( root->left!=NULL && root->right != NULL){
+       int min = minVal(root->right);
+            root->data = min;  // replace with the smallest node in the right subtree
+            root->right = DeleteIntoBST(root->right, min);  // delete that smallest node
+        }
+        else if(root->data > value){
+        root->left = DeleteIntoBST(root->left, value);
+    } else {
+        root->right = DeleteIntoBST(root->right, value);
+    }
+
+    return root;
+}
+int minVal(Node* root){
+    Node* temp = root;
+    while(temp->left != NULL){
+        temp = temp->left;
+    }
+    return temp->data;
+}
+void inorder(Node*root){
+  if(root==NULL){
+    return;
+  }
+    inorder(root->left);
+    cout<<root->data<<" ";
+    inorder(root->right);
+}
+void preoder(Node*root){
+  if(root==NULL){
+    return;
+  }
+    cout<<root->data<<" ";
+    preoder(root->left);
+    preoder(root->right);
+}
+void postorder(Node*root){
+  if(root==NULL){
+    return;
+  }
+  postorder(root->left);
+  postorder(root->right);
+  cout<<root->data<<" ";
+}
+int main(){
+  Node*root=NULL;
+  root=InsertIntoBST(root,5);
+  root=InsertIntoBST(root,45);
+  root=InsertIntoBST(root,3);
+  root=InsertIntoBST(root,9);
+  cout<<"inorder of BST:";
+  inorder(root);
+  cout<<endl;
+  cout<<"preoder of BST:";
+  preoder(root);
+  cout<<endl;
+  cout<<"postorder of BST:";
+  postorder(root);
+  DeleteIntoBST(root,3);
+  cout<<"inorder";
+  inorder(root);
+}
