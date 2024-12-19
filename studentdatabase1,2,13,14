@@ -1,0 +1,207 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct student {
+    int roll;
+    string name;
+    float sgpa;
+};
+
+void creatstudentdata(student s[15], int n) {
+    for (int i = 0; i < n; i++) {
+        cout << "\n Enter roll, name, sgpa of student " << i + 1 << ": ";
+        cin >> s[i].roll >> s[i].name >> s[i].sgpa;
+    }
+}
+
+void displaystudentdatabase(student s[15], int n) {
+    cout << "\n\t1) Roll No.\t2) Name\t3) SGPA";
+    for (int i = 0; i < n; i++) {
+        cout << "\n\t" << s[i].roll << "\t" << s[i].name << "\t" << s[i].sgpa;
+    }
+    cout << endl;
+}
+
+void BubblesortRoll(student s[15], int n) {
+    for (int i = 1; i < n; i++) {
+        for (int j = 0; j < n - i; j++) {
+            if (s[j].roll > s[j + 1].roll) {
+                swap(s[j], s[j + 1]);  // Swap entire student objects
+            }
+        }
+    }
+}
+
+void InsertionSort(student s[15], int n) {
+    for (int i = 1; i < n; i++) {
+        student temp = s[i];
+        int j = i - 1;
+        while (j >= 0 && s[j].name > temp.name) {
+            s[j + 1] = s[j];
+            j = j - 1;
+        }
+        s[j + 1] = temp;  // Correct insertion of student object
+    }
+}
+
+int partition(student s[20], int l, int h) {
+    float pivot = s[l].sgpa;
+    int i = l + 1;
+    int j = h;
+
+    while (true) {
+        while (i <= j && s[i].sgpa > pivot) {
+            i++;
+        }
+        while (i <= j && s[j].sgpa <= pivot) {
+            j--;
+        }
+        if (i <= j) {
+            swap(s[i], s[j]);
+            i++;
+            j--;
+        } else {
+            break;
+        }
+    }
+    swap(s[l], s[j]);
+    return j;
+}
+
+void quick_sort(student s[20], int l, int h) {
+    if (l < h) {
+        int j = partition(s, l, h);
+        quick_sort(s, l, j - 1);
+        quick_sort(s, j + 1, h);
+    }
+}
+
+// Binary Search for student name (non-recursive)
+void binarySearchByName(student s[15], int n, string key) {
+    int low = 0, high = n - 1;
+    bool found = false;
+    
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        
+        if (s[mid].name == key) {
+            found = true;
+            int left = mid, right = mid;
+            
+            // Search left side for the same name
+            while (left >= 0 && s[left].name == key) {
+                left--;
+            }
+            
+            // Search right side for the same name
+            while (right < n && s[right].name == key) {
+                right++;
+            }
+            
+            // Display all students with the same name
+            for (int i = left + 1; i < right; i++) {
+                cout << "\n\t" << s[i].roll << "\t" << s[i].name << "\t" << s[i].sgpa;
+            }
+            break;
+        }
+        else if (s[mid].name < key) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    
+    if (!found) {
+        cout << "No student found with the name " << key << endl;
+    }
+}
+void searchBySGPA(student s[15], int n, float sgpa) {
+    bool found = false;
+    cout << "\nStudents with SGPA " << sgpa << ":";
+    for (int i = 0; i < n; i++) {
+        if (s[i].sgpa == sgpa) {
+            cout << "\n\t" << s[i].roll << "\t" << s[i].name << "\t" << s[i].sgpa;
+            found = true;
+        }
+    }
+    if (!found) {
+        cout << "\nNo students found with SGPA " << sgpa << endl;
+    }
+}
+
+int main() {
+    student s[15];
+    int n, ch;
+    string searchKey;
+    float searchSGPA;
+
+
+    cout << "Enter number of students: ";
+    cin >> n;
+
+    do {
+        cout << "\n1) Create Student Database";
+        cout << "\n2) Display Student Database";
+        cout << "\n3) Bubble Sort by Roll No";
+        cout << "\n4) Insertion Sort by Name";
+        cout << "\n5) Quick Sort by SGPA (Descending)";
+        cout << "\n6) Binary Search by Name";
+        cout << "\n7) Search by SGPA";
+        cout << "\n8) Exit";
+        cout << "\nEnter choice: ";
+        cin >> ch;
+
+        switch (ch) {
+        case 1:
+            creatstudentdata(s, n);
+            break;
+        case 2:
+            displaystudentdatabase(s, n);
+            break;
+        case 3:
+            BubblesortRoll(s, n);
+            displaystudentdatabase(s, n);  // Display after sorting
+            break;
+        case 4:
+            InsertionSort(s, n);
+            displaystudentdatabase(s, n);  // Display after sorting
+            break;
+        case 5:
+            if (n > 0) {
+                quick_sort(s, 0, n - 1);
+                cout << "Database sorted by SGPA (descending).\n";
+                displaystudentdatabase(s, n);
+            } else {
+                cout << "No records found. Please create the database first.\n";
+            }
+            break;
+        case 6:
+            if (n > 0) {
+                cout << "Enter the name of the student to search: ";
+                cin >> searchKey;
+                binarySearchByName(s, n, searchKey);
+            } else {
+                cout << "No records found. Please create the database first.\n";
+            }
+            break;
+            case 7:
+            if (n > 0) {
+                cout << "Enter SGPA to search: ";
+                cin >> searchSGPA;
+                searchBySGPA(s, n, searchSGPA);
+            } else {
+                cout << "No records found. Please create the database first.\n";
+            }
+            break;
+
+        case 8:
+            return 0;
+        default:
+            cout << "Invalid input." << endl;
+            break;
+        }
+    } while (ch != 8);
+
+    return 0;
+}
